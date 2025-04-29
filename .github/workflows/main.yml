@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrapingBlaster - Business Lead Generation System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/marked@4.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4B4AB2',
+                        'primary-light': '#7E7DE8',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .gradient-bg {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #d946ef);
+            background-size: 200% 200%;
+            animation: gradientBg 10s ease infinite;
+        }
+        .loader {
+            border-top-color: #5D5CDE;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Placeholder styling */
+        .placeholder-text:focus::placeholder {
+            color: transparent;
+        }
+        /* Digital assistant avatar animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse-avatar {
+            animation: pulse 3s infinite;
+        }
+        /* Source highlight effect */
+        .source-link {
+            transition: all 0.3s ease;
+        }
+        .source-link:hover {
+            background-color: rgba(93, 92, 222, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-200">
+    <!-- Dark Mode Detection -->
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <!-- Main Container -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Welcome Screen (initially visible, hidden after sign-in) -->
+        <div id="welcomeScreen" class="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+            <div class="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+                <div class="gradient-bg p-6 text-white text-center">
+                    <h1 class="text-3xl font-bold">ScrapingBlaster</h1>
+                    <p class="mt-2 text-lg">The Ultimate Lead Generation Tool</p>
+                </div>
+                
+                <div class="p-8 relative">
+                    <!-- Digital assistant avatar -->
+                    <div class="absolute top-4 right-4 w-20 h-20 pulse-avatar">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                            <circle cx="100" cy="100" r="80" fill="#5D5CDE" />
+                            <circle cx="70" cy="80" r="10" fill="white" />
+                            <circle cx="130" cy="80" r="10" fill="white" />
+                            <path d="M70,130 Q100,160 130,130" stroke="white" stroke-width="5" fill="none" />
+                        </svg>
+                    </div>
+                    
+                    <div id="welcomeMessage" class="mb-8 flex items-start">
+                        <div class="mr-4 flex-shrink-0 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-medium mb-3 dark:text-white">Hello User, my name is ScrapingBlaster. I am happy to welcome you to my Platform with a warm welcome!</p>
+                            <p class="text-gray-600 dark:text-gray-300">Please tell me your name so I can address you properly.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" for="firstName">First Name</label>
+                    <input id="firstName" type="text" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary placeholder-text" placeholder="First Name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" for="lastName">Last Name</label>
+                            <input id="lastName" type="text" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary placeholder-text" placeholder="Last Name">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Contact Email (for support)</label>
+                        <div class="flex items-center">
+                            <input type="text" value="jennifereschmidtb2022@gmail.com" readonly class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                            <button id="copyEmailBtn" class="ml-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+                                    <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Please save this email for future support requests</p>
+                    </div>
+                    
+                    <div class="flex justify-center">
+                        <button id="startBtn" class="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg transition text-lg">
+                            Get Started
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="gradient-bg text-white py-4 px-6 shadow-lg">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-3">
+                        <circle cx="100" cy="100" r="80" fill="white" fill-opacity="0.9" />
+                        <circle cx="70" cy="80" r="10" fill="#5D5CDE" />
+                        <circle cx="130" cy="80" r="10" fill="#5D5CDE" />
+                        <path d="M70,130 Q100,160 130,130" stroke="#5D5CDE" stroke-width="5" fill="none" />
+                    </svg>
+                    <div>
+                        <h1 class="text-2xl font-bold">ScrapingBlaster</h1>
+                        <p id="headerGreeting" class="text-sm opacity-0 transition-opacity duration-500">Hello <span id="userNameDisplay"></span>!</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="leadCount" class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                        5 free leads available
+                    </span>
+                    <button id="helpBtn" class="bg-white bg-opacity-20 hover:bg-opacity-30 transition px-3 py-1 rounded-full text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                        </svg>
+                        Help
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- Progress Steps -->
+            <div class="relative mb-8">
+               <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 dark:bg-gray-700"></div>
+                <div class="relative flex justify-between">
+                    <div class="step active" data-step="1">
+                        <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center relative z-10">1</div>
+                        <div class="text-xs mt-2 font-medium">Configure</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center relative z-10">2</div>
+                        <div class="text-xs mt-2 font-medium">Scrape</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center relative z-10">3</div>
+                        <div class="text-xs mt-2 font-medium">Emails</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center relative z-10">4</div>
+                        <div class="text-xs mt-2 font-medium">Review</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center relative z-10">5</div>
+                        <div class="text-xs mt-2 font-medium">Export</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content container -->
+            <div id="mainContent" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <!-- Step 1: Configure -->
+                <div id="step1" class="step-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Configure Scraping Requirements</h2>
+                        <div class="flex items-center space-x-2">
+                            <button id="settingsBtn" class="flex items-center text-sm px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                </svg>
+                                Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium mb-4">Search Parameters</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium mb-2" for="industryType">
+                                        Industry Type
+                                    </label>
+                                    <select id="industryType" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <option value="" disabled selected>Select industry</option>
+                                        <option value="technology">Technology</option>
+                                        <option value="finance">Finance & Insurance</option>
+                                        <option value="healthcare">Healthcare</option>
+                                        <option value="retail">Retail</option>
+                                        <option value="manufacturing">Manufacturing</option>
+                                        <option value="services">Professional Services</option>
+                                        <option value="realestate">Real Estate</option>
+                                        <option value="education">Education</option>
+                                        <option value="hospitality">Hospitality</option>
+                                        <option value="construction">Construction</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium mb-2" for="location">
+                                        Location
+                                    </label>
+                               <select id="location" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <option value="" disabled selected>Select location</option>
+                                        <option value="any">Any Location</option>
+                                        <option value="northeast">Northeast US</option>
+                                        <option value="southeast">Southeast US</option>
+                                        <option value="midwest">Midwest US</option>
+                                        <option value="southwest">Southwest US</option>
+                                        <option value="west">West US</option>
+                                        <option value="california">California</option>
+                                        <option value="newyork">New York</option>
+                                        <option value="texas">Texas</option>
+                                        <option value="florida">Florida</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium mb-2" for="companySize">
+                                        Company Size
+                                    </label>
+                                    <select id="companySize" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <option value="" disabled selected>Select company size</option>
+                                        <option value="small">Small (1-50 employees)</option>
+                                        <option value="medium">Medium (51-250 employees)</option>
+                                        <option value="large">Large (251-1000 employees)</option>
+                                        <option value="enterprise">Enterprise (1000+ employees)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium mb-2" for="customSearch">
+                                        Custom Search Query (Premium Feature)
+                                    </label>
+                                    <div class="flex items-center">
+                                        <input id="customSearch" type="text" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., 'hiring marketing manager'" disabled>
+                                        <div class="ml-2 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                                            Premium
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium mb-4">Data Points to Scrape</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">The following information will be scraped from Google and business websites.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_business_name" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_business_name" class="ml-2 text-sm font-medium">Business Name</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_phone" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_phone" class="ml-2 text-sm font-medium">Phone Number</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_email" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_email" class="ml-2 text-sm font-medium">Email Address</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_state" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_state" class="ml-2 text-sm font-medium">State</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_owner" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_owner" class="ml-2 text-sm font-medium">Owner's Name</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_services" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_services" class="ml-2 text-sm font-medium">Services Offered</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_revenue" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_revenue" class="ml-2 text-sm font-medium">Revenue</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                            
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <input id="dp_website" type="checkbox" checked disabled class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dp_website" class="ml-2 text-sm font-medium">Website</label>
+                                </div>
+                                <input type="text" class="w-full px-3 py-2 text-sm rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" placeholder="Sample data will appear here" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium mb-4">Email Customization</h3>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                            <label class="block text-sm font-medium mb-2" for="emailTemplate">
+                                Email Template (What would you like to say to each business?)
+                            </label>
+                            <textarea id="emailTemplate" rows="4" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter a generic email template here that will be personalized for each business..."></textarea>
+                            
+                            <div class="flex items-start mt-3">
+                                <input id="enhanceEmails" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded mt-1">
+                                <label for="enhanceEmails" class="ml-2 text-sm">
+                                    I would like ScrapingBlaster to improve this email and create an enhanced version for each business
+                                </label>
+               </div>
+                        </div>
+                        
+                        <div class="flex items-center mb-4">
+                            <input id="noEmailsNeeded" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded">
+                            <label for="noEmailsNeeded" class="ml-2 text-sm">
+                                No emails needed (just scrape the data points)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-6">
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">
+                                    You will receive 5 free business leads. Additional leads cost $0.25 each.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-shrink-0">
+                            <select id="purchaseOptions" class="text-sm px-3 py-1 rounded border border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="5">5 Free Leads</option>
+                                <option value="10">10 Leads ($1.25)</option>
+                                <option value="20">20 Leads ($3.75)</option>
+                                <option value="50">50 Leads ($11.25)</option>
+                                <option value="100">100 Leads ($23.75)</option>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <div class="flex justify-end">
+                        <button id="nextBtn1" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transition">
+          Start Scraping
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Scraping -->
+                <div id="step2" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Data Scraping in Progress</h2>
+                    
+                    <div id="scrapingProgress" class="mb-8">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <span class="text-lg font-medium">Scraping businesses...</span>
+                                <span id="progressCounter" class="ml-2">1/5</span>
+                            </div>
+                            <span id="progressPercentage" class="text-lg font-medium">20%</span>
+                        </div>
+                        
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                            <div id="progressBar" class="bg-primary h-2.5 rounded-full" style="width: 20%"></div>
+                        </div>
+                        
+                        <div id="currentActionText" class="text-sm text-gray-600 dark:text-gray-400">
+                            Searching for business information...
+                        </div>
+                    </div>
+                    
+                    <div id="scrapingLiveResults" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                        <h3 class="font-medium mb-3">Live Results</h3>
+                        
+                        <div id="liveResultsContainer" class="max-h-64 overflow-y-auto space-y-3">
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="font-medium">Searching for businesses...</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Query: [Technology] in [California]</div>
+                                    </div>
+                                    <span class="text-xs bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full">In Progress</span>
+                                </div>
+    </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-6">
+                        <div class="text-sm">
+                            <span class="font-medium">Estimated completion time:</span>
+                            <span id="estimatedTime">2 minutes</span>
+                        </div>
+                        
+                        <div>
+                            <button id="cancelScraping" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium text-sm transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button id="backBtn2" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition">
+                            Back
+                        </button>
+                        <button id="nextBtn2" class="bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed font-medium py-2 px-6 rounded-lg transition">
+                            Next: Email Creation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Email Creation -->
+                <div id="step3" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Create Email Templates</h2>
+                    
+                    <div class="mb-6">
+                        <p class="mb-4">ScrapingBlaster has found 5 businesses matching your criteria. You can now create email templates for each.</p>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg mb-6">
+                            <div class="flex items-start">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 dark:text-blue-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                                </svg>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-800 dark:text-blue-300">
+                                        Check the boxes below if you want ScrapingBlaster to generate emails for you. Otherwise, you can write your own.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-8">
+                            <!-- Email Template 1 -->
+                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <input id="generateEmail1" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded" checked>
+                                        <label for="generateEmail1" class="ml-2 font-medium">Email Template #1</label>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        TechSolutions Inc
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="emailContent1" rows="5" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email content will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Template 2 -->
+                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <div class="flex items-center">
+                           <input id="generateEmail2" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded" checked>
+                                        <label for="generateEmail2" class="ml-2 font-medium">Email Template #2</label>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        ByteWave Systems
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="emailContent2" rows="5" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email content will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Template 3 -->
+                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <input id="generateEmail3" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded" checked>
+                                        <label for="generateEmail3" class="ml-2 font-medium">Email Template #3</label>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Quantum IT Solutions
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="emailContent3" rows="5" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email content will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Template 4 -->
+                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <input id="generateEmail4" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded" checked>
+                                        <label for="generateEmail4" class="ml-2 font-medium">Email Template #4</label>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Digital Dynamics
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="emailContent4" rows="5" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email content will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Template 5 -->
+                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <input id="generateEmail5" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded" checked>
+                                        <label for="generateEmail5" class="ml-2 font-medium">Email Template #5</label>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        NextGen Technologies
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="emailContent5" rows="5" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email content will appear here..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-6">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="font-medium">Chat with ScrapingBlaster</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <textarea id="chatWithBot" rows="2" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ask a question or provide suggestions..."></textarea>
+                            <div class="flex justify-end mt-2">
+                                <button id="sendBotMessage" class="bg-primary hover:bg-primary-dark text-white px-3 py-1 rounded text-sm font-medium transition">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button id="backBtn3" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition">
+                            Back
+                        </button>
+                        <button id="nextBtn3" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transition">
+                            Generate & Continue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review Business by Business -->
+                <div id="step4" class="step-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Review & Send Emails</h2>
+                        <div class="text-sm">
+                            <span class="font-medium">Business</span>
+                            <span id="businessCounter" class="ml-1 bg-primary text-white px-2 py-0.5 rounded">1/5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Business Data -->
+                        <div class="lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3">
+                                <h3 class="font-medium" id="currentBusinessName">TechSolutions Inc</h3>
+                            </div>
+                            <div class="p-4 space-y-4">
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Business Name</div>
+                                    <div class="font-medium" id="reviewBusinessName">TechSolutions Inc</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone Number</div>
+                                    <div class="font-medium" id="reviewPhone">(555) 123-4567</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Email Address</div>
+                                    <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline" id="reviewEmail">info@techsolutions.ex</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">State</div>
+                                    <div class="font-medium" id="reviewState">California</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Owner's Name</div>
+                                    <div class="font-medium" id="reviewOwner">Alex Johnson</div>
+                                </div>
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Services Offered</div>
+                                    <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline" id="reviewServices">IT Consulting, Software Development</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Revenue</div>
+                                    <div class="font-medium" id="reviewRevenue">$1.5M - $3M</div>
+                                </div>
+                                
+                                <div class="source-link p-2 rounded hover:shadow-md transition">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Website</div>
+                                    <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline" id="reviewWebsite">www.techsolutions.ex</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Comparison -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <!-- Your Email -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <h3 class="font-medium">Your Email Draft</h3>
+                                    <button class="text-xs bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 px-2 py-1 rounded transition">
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="userEmailDraft" rows="7" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Your email draft will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- ScrapingBlaster's Email -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-between items-center">
+                                    <h3 class="font-medium">ScrapingBlaster's Enhanced Email</h3>
+                                    <button class="text-xs bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 px-2 py-1 rounded transition">
+                                        Copy
+                                    </button>
+                                </div>
+                                <div class="p-4">
+                                    <textarea id="enhancedEmailDraft" rows="7" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="The enhanced email will appear here..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <button id="sendEmailBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                        </svg>
+                                        Send Email
+                                    </button>
+                                </div>
+                                <div>
+                                    <button id="skipBusinessBtn" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium transition">
+                                        Skip Business
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Controls -->
+      <div class="flex justify-between items-center mt-8">
+                        <button id="prevBusinessBtn" class="flex items-center text-primary hover:text-primary-dark font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Previous Business
+                        </button>
+                        
+                        <button id="nextBusinessBtn" class="flex items-center text-primary hover:text-primary-dark font-medium transition">
+                            Next Business
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-6">
+                        <div class="flex justify-between">
+                            <button id="backBtn4" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition">
+                                Back
+                            </button>
+                            <button id="nextBtn4" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transition">
+                                Complete & Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Export -->
+                <div id="step5" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">Lead Generation Complete</h2>
+             <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-green-800 dark:text-green-300">Success!</h3>
+                                <p class="mt-2 text-green-700 dark:text-green-400">Your lead generation is complete. You've successfully scraped <span id="completedLeadsCount">5</span> businesses.</p>
+                                <p class="mt-2 text-green-700 dark:text-green-400"><span id="emailsSentCount">3</span> emails have been sent to the contacts.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <!-- Export Options -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-4">Export Your Data</h3>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Download your scraped lead data in your preferred format.</p>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center">
+                                        <input id="formatExcel" name="exportFormat" type="radio" checked class="h-4 w-4 text-primary focus:ring-primary">
+                                        <label for="formatExcel" class="ml-2 text-sm font-medium">Microsoft Excel (.xlsx)</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="formatCSV" name="exportFormat" type="radio" class="h-4 w-4 text-primary focus:ring-primary">
+                                        <label for="formatCSV" class="ml-2 text-sm font-medium">Comma Separated Values (.csv)</label>
+                  </div>
+                                    <div class="flex items-center">
+                                        <input id="formatGoogle" name="exportFormat" type="radio" class="h-4 w-4 text-primary focus:ring-primary">
+                                        <label for="formatGoogle" class="ml-2 text-sm font-medium">Google Sheets (requires Google login)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <button id="exportDataBtn" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition w-full flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                        Download Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Feedback -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-4">Provide Feedback</h3>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">How was your experience with ScrapingBlaster?</p>
+                                
+                                <div class="flex space-x-2 mb-4">
+                                    <button class="rating-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-rating="1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                      </button>
+                                    <button class="rating-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-rating="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </button>
+                                    <button class="rating-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-rating="3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </button>
+                                    <button class="rating-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-rating="4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </button>
+                                    <button class="rating-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition" data-rating="5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                          </button>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <textarea id="feedbackText" rows="3" class="w-full px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="What did you like or dislike? Any suggestions for improvement?"></textarea>
+                                </div>
+                                
+                                <div class="flex items-center mb-4">
+                                    <input id="dissatisfied" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary rounded">
+                                    <label for="dissatisfied" class="ml-2 text-sm">
+                                        I'm not satisfied with the leads (eligible for a free scraping)
+                                    </label>
+                                </div>
+                                
+                                <button id="submitFeedbackBtn" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition">
+                                    Submit Feedback
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-medium mb-4">Need More Leads?</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center">
+                                <div class="text-2xl font-bold mb-2">10</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">Additional Leads</div>
+                                <div class="text-lg font-bold mb-4">$2.50</div>
+                                <button class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition w-full">
+                                    Purchase
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-primary p-4 text-center relative">
+                                <div class="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/2 bg-primary text-white text-xs px-2 py-0.5 rounded-full">
+                                    Best Value
+                                </div>
+                                <div class="text-2xl font-bold mb-2">50</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">Additional Leads</div>
+                                <div class="text-lg font-bold mb-4">$11.25</div>
+                                <button class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition w-full">
+                                    Purchase
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center">
+                                <div class="text-2xl font-bold mb-2">100</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">Additional Leads</div>
+                                <div class="text-lg font-bold mb-4">$23.75</div>
+                                <button class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition w-full">
+                                    Purchase
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button id="backBtn5" class="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition">
+                            Back
+                        </button>
+                        <button id="startNewBtn" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transition">
+                            Start New Scraping
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-100 dark:bg-gray-800 py-6 px-6 mt-auto">
+       <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 md:mb-0">
+                        &copy; 2023 ScrapingBlaster. All rights reserved.
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition">Terms</a>
+                        <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition">Privacy</a>
+                        <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition">Support</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Welcome screen and user name handling
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const startBtn = document.getElementById('startBtn');
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const headerGreeting = document.getElementById('headerGreeting');
+            const copyEmailBtn = document.getElementById('copyEmailBtn');
+            
+            // Welcome screen audio (simulated, as actual audio would require user interaction first)
+            function playWelcomeAudio() {
+                console.log("Playing welcome audio: 'Hello User, my name is ScrapingBlaster. I am happy to welcome you to my Platform with a warm welcome!'");
+                // In a real implementation, this would use the Web Audio API or HTML5 Audio
+            }
+            
+            // Simulate audio greeting on page load
+            setTimeout(playWelcomeAudio, 1000);
+            
+            // Input field placeholders
+            firstName.addEventListener('focus', function() {
+                this.placeholder = '';
+            });
+            
+            firstName.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.placeholder = 'First Name';
+                }
+            });
+            
+            lastName.addEventListener('focus', function() {
+                this.placeholder = '';
+            });
+            
+            lastName.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.placeholder = 'Last Name';
+                }
+            });
+            
+            // Start button
+            startBtn.addEventListener('click', function() {
+                if (!firstName.value) {
+                    alert('Please enter your first name to continue.');
+                    firstName.focus();
+                    return;
+                }
+                
+                welcomeScreen.style.opacity = '0';
+                welcomeScreen.style.transition = 'opacity 0.5s ease-out';
+                
+                setTimeout(() => {
+                    welcomeScreen.style.display = 'none';
+                    
+                    // Show user name in header
+                    userNameDisplay.textContent = firstName.value;
+                    headerGreeting.style.opacity = '1';
+                    
+                    // Simulate greeting with name
+                    console.log(`Playing audio: 'It's nice to meet you, ${firstName.value}!'`);
+                }, 500);
+            });
+            
+            // Copy email button
+            copyEmailBtn.addEventListener('click', function() {
+                const emailToCopy = 'jennifereschmidtb2022@gmail.com';
+                navigator.clipboard.writeText(emailToCopy).then(() => {
+              this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    `;
+                    
+                    setTimeout(() => {
+                        this.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+                                <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
+                            </svg>
+                        `;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy email: ', err);
+                });
+            });
+            
+            // Step Navigation
+            const steps = document.querySelectorAll('.step');
+            const stepContents = document.querySelectorAll('.step-content');
+            
+            function setActiveStep(stepNumber) {
+                steps.forEach((step, index) => {
+                    const stepElement = step.querySelector('div:first-child');
+                    if (index < stepNumber) {
+                        stepElement.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-600', 'dark:text-gray-300');
+                        stepElement.classList.add('bg-green-500', 'text-white');
+                        stepElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>`;
+                    } else if (index === stepNumber) {
+                        stepElement.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-600', 'dark:text-gray-300', 'bg-green-500');
+                        stepElement.classList.add('bg-primary', 'text-white');
+                        stepElement.textContent = index + 1;
+                    } else {
+                        stepElement.classList.remove('bg-primary', 'text-white', 'bg-green-500');
+                        stepElement.classList.add('bg-gray-300', 'dark:bg-gray-600', 'text-gray-600', 'dark:text-gray-300');
+                        stepElement.textContent = index + 1;
+                    }
+                });
+                
+                stepContents.forEach((content, index) => {
+                    if (index === stepNumber) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Sample lead data
+            const sampleLeads = {
+                'technology': [
+                    {
+                        business: 'TechSolutions Inc',
+                        owner: 'Alex Johnson',
+                        phone: '(555) 123-4567',
+                        email: 'info@techsolutions.ex',
+                        state: 'California',
+                        services: 'IT Consulting, Software Development',
+                        revenue: '$1.5M - $3M',
+                        website: 'www.techsolutions.ex'
+                    },
+                    {
+                        business: 'ByteWave Systems',
+                        owner: 'Sarah Chen',
+                        phone: '(555) 234-5678',
+                        email: 'sarah@bytewave.ex',
+                        state: 'Washington',
+                        services: 'Cloud Services, App Development',
+                        revenue: '$500K - $1M',
+                        website: 'www.bytewave.ex'
+                    },
+         {
+                        business: 'Quantum IT Solutions',
+                        owner: 'Michael Patel',
+                        phone: '(555) 345-6789',
+                        email: 'contact@quantumit.ex',
+                        state: 'Texas',
+                        services: 'Network Security, IT Management',
+                        revenue: '$3M - $5M',
+                        website: 'www.quantumit.ex'
+                    },
+                    {
+                        business: 'Digital Dynamics',
+                        owner: 'Jessica Williams',
+                        phone: '(555) 456-7890',
+                        email: 'jessica@digitaldyn.ex',
+                        state: 'New York',
+                        services: 'Web Development, Digital Marketing',
+                        revenue: '$1M - $2M',
+                        website: 'www.digitaldynamics.ex'
+                    },
+                    {
+                        business: 'NextGen Technologies',
+                        owner: 'Robert Kim',
+                        phone: '(555) 567-8901',
+                        email: 'robert@nextgen.ex',
+                        state: 'Massachusetts',
+                        services: 'AI Solutions, Data Analytics',
+                        revenue: '$5M - $10M',
+                        website: 'www.nextgentech.ex'
+                    }
+                ]
+            };
+            
+            // Step 1: Configure
+            const nextBtn1 = document.getElementById('nextBtn1');
+            
+            nextBtn1.addEventListener('click', function() {
+                const industry = document.getElementById('industryType').value;
+                const location = document.getElementById('location').value;
+                const companySize = document.getElementById('companySize').value;
+                
+                if (!industry || !location || !companySize) {
+                    alert('Please select industry, location, and company size.');
+                    return;
+                }
+                
+                // Start the scraping process
+                setActiveStep(1);
+                startScraping();
+            });
+            
+            // Step 2: Scraping
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressCounter = document.getElementById('progressCounter');
+            const currentActionText = document.getElementById('currentActionText');
+            const liveResultsContainer = document.getElementById('liveResultsContainer');
+            const backBtn2 = document.getElementById('backBtn2');
+            const nextBtn2 = document.getElementById('nextBtn2');
+            
+            function startScraping() {
+                // Simulate scraping process
+                let progress = 0;
+                let leadCount = 0;
+                
+                const actions = [
+                    "Searching for businesses in selected industry...",
+                    "Collecting contact information...",
+                    "Verifying email addresses...",
+                    "Extracting owner information...",
+                    "Analyzing services offered...",
+                    "Gathering revenue data...",
+                    "Compiling website information...",
+                    "Finalizing lead data..."
+                ];
+                
+                const interval = setInterval(() => {
+                    progress += 5;
+                    
+                    // Update progress bar
+                    progressBar.style.width = `${progress}%`;
+                    progressPercentage.textContent = `${progress}%`;
+                    
+                    // Update action text randomly
+                    if (progress % 20 === 0) {
+                        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                        currentActionText.textContent = randomAction;
+                    }
+                   
+                    // Add new result at certain intervals
+                    if (progress % 20 === 0 && leadCount < 5) {
+                        leadCount++;
+                        progressCounter.textContent = `${leadCount}/5`;
+                        
+                        const lead = sampleLeads.technology[leadCount - 1];
+                        
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 mb-3';
+                        resultDiv.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="font-medium">${lead.business}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        <span class="inline-block mr-3">Owner: ${lead.owner}</span>
+                                        <span class="inline-block">${lead.state}</span>
+                                    </div>
+                                </div>
+                                <span class="text-xs bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">Found</span>
+                            </div>
+                        `;
+                        
+                        liveResultsContainer.prepend(resultDiv);
+                    }
+                    
+                    // Complete scraping
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        currentActionText.textContent = "Scraping complete!";
+                        nextBtn2.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-400', 'cursor-not-allowed');
+                        nextBtn2.classList.add('bg-primary', 'hover:bg-primary-dark', 'text-white');
+                        
+                        // Pre-fill email templates based on scraped leads
+                        prepareEmailTemplates();
+                        
+                        // Add event listener to continue
+                        nextBtn2.addEventListener('click', function() {
+                            setActiveStep(2);
+                        });
+                    }
+                    
+                }, 300);
+            }
+            
+            backBtn2.addEventListener('click', function() {
+                setActiveStep(0);
+            });
+            
+            // Step 3: Email Creation
+            const backBtn3 = document.getElementById('backBtn3');
+            const nextBtn3 = document.getElementById('nextBtn3');
+            
+            function prepareEmailTemplates() {
+                const userTemplate = document.getElementById('emailTemplate').value;
+                const enhanceEmails = document.getElementById('enhanceEmails').checked;
+                const noEmailsNeeded = document.getElementById('noEmailsNeeded').checked;
+                
+                if (noEmailsNeeded) {
+                    // Skip email creation
+                    return;
+                }
+                
+                // Default template if user didn't provide one
+                const defaultTemplate = "Hello [Owner's Name],\n\nI came across [Business Name] and I'm impressed with your [Services]. I'd like to discuss a potential opportunity that could benefit your business.\n\nLooking forward to connecting,\n[Your Name]";
+                
+                const template = userTemplate || defaultTemplate;
+                
+                // Fill the email templates
+                for (let i = 1; i <= 5; i++) {
+                    const lead = sampleLeads.technology[i - 1];
+                    const emailContent = document.getElementById(`emailContent${i}`);
+                    
+                    // Basic personalization
+                    let personalizedEmail = template
+                        .replace('[Owner\'s Name]', lead.owner)
+                        .replace('[Business Name]', lead.business)
+                        .replace('[Services]', lead.services.split(',')[0])
+                        .replace('[Your Name]', firstName.value);
+                    
+                    emailContent.value = personalizedEmail;
+                }
+            }
+  
+            backBtn3.addEventListener('click', function() {
+                setActiveStep(1);
+            });
+            
+            nextBtn3.addEventListener('click', function() {
+                // Generate enhanced emails if requested
+                const enhanceEmails = document.getElementById('enhanceEmails').checked;
+                
+                if (enhanceEmails) {
+                    simulateEnhancedEmails();
+                }
+                
+                // Move to review stage
+                setActiveStep(3);
+                
+                // Initialize business review
+                currentBusinessIndex = 0;
+                updateBusinessReview();
+            });
+            
+            function simulateEnhancedEmails() {
+                // This would be where the AI enhancement would happen
+                // For now, we'll just simulate it
+                console.log("Generating enhanced emails...");
+                
+                // In a real implementation, this would use the Poe API to call a bot
+                // window.Poe.sendUserMessage("@Claude-3.7-Sonnet Please improve this email: " + emailContent);
+            }
+            
+            // Step 4: Review Business by Business
+            const backBtn4 = document.getElementById('backBtn4');
+            const nextBtn4 = document.getElementById('nextBtn4');
+            const prevBusinessBtn = document.getElementById('prevBusinessBtn');
+            const nextBusinessBtn = document.getElementById('nextBusinessBtn');
+            const skipBusinessBtn = document.getElementById('skipBusinessBtn');
+            const sendEmailBtn = document.getElementById('sendEmailBtn');
+            const businessCounter = document.getElementById('businessCounter');
+            
+            let currentBusinessIndex = 0;
+            let sentEmails = 0;
+            let skippedBusinesses = 0;
+            
+            function updateBusinessReview() {
+                const lead = sampleLeads.technology[currentBusinessIndex];
+                
+                // Update the counter
+                businessCounter.textContent = `${currentBusinessIndex + 1}/5`;
+                
+                // Update business data
+                document.getElementById('currentBusinessName').textContent = lead.business;
+                document.getElementById('reviewBusinessName').textContent = lead.business;
+                document.getElementById('reviewPhone').textContent = lead.phone;
+                document.getElementById('reviewEmail').textContent = lead.email;
+                document.getElementById('reviewState').textContent = lead.state;
+                document.getElementById('reviewOwner').textContent = lead.owner;
+                document.getElementById('reviewServices').textContent = lead.services;
+                document.getElementById('reviewRevenue').textContent = lead.revenue;
+                document.getElementById('reviewWebsite').textContent = lead.website;
+                
+                // Update email drafts
+                const emailTemplate = document.getElementById(`emailContent${currentBusinessIndex + 1}`).value;
+                document.getElementById('userEmailDraft').value = emailTemplate;
+                
+                // For demo purposes, create slightly enhanced version
+                const enhancedTemplate = emailTemplate
+                    .replace(
+                        `I came across ${lead.business}`,
+                        `I recently researched ${lead.business} and was particularly impressed with your approach to ${lead.services.split(',')[0]}`
+                    )
+                    .replace(
+                        `potential opportunity`,
+                        `mutually beneficial opportunity`
+                    );
+                document.getElementById('enhancedEmailDraft').value = enhancedTemplate;
+                
+                // Disable previous button if at first business
+                if (currentBusinessIndex === 0) {
+                    prevBusinessBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    prevBusinessBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                
+                // Change next button text if at last business
+                if (currentBusinessIndex === 4) {
+                    nextBusinessBtn.innerHTML = `
+                        Finish Review
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    `;
+                } else {
+                    nextBusinessBtn.innerHTML = `
+                        Next Business
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    `;
+                }
+            }
+            
+            prevBusinessBtn.addEventListener('click', function() {
+                if (currentBusinessIndex > 0) {
+                    currentBusinessIndex--;
+                    updateBusinessReview();
+                }
+            });
+            
+            nextBusinessBtn.addEventListener('click', function() {
+                if (currentBusinessIndex < 4) {
+                    currentBusinessIndex++;
+                    updateBusinessReview();
+                } else {
+                    // At the last business, go to export step
+                    setActiveStep(4);
+                    document.getElementById('completedLeadsCount').textContent = 5;
+                    document.getElementById('emailsSentCount').textContent = sentEmails;
+                }
+            });
+            
+            skipBusinessBtn.addEventListener('click', function() {
+                if (currentBusinessIndex < 4) {
+                    skippedBusinesses++;
+                    currentBusinessIndex++;
+                    updateBusinessReview();
+                } else {
+                    // If skipping the last business, go to export
+                    setActiveStep(4);
+                    document.getElementById('completedLeadsCount').textContent = 5;
+                    document.getElementById('emailsSentCount').textContent = sentEmails;
+                }
+            });
+            
+            sendEmailBtn.addEventListener('click', function() {
+                // Simulate sending email
+                sentEmails++;
+                
+                // Show success toast
+                const lead = sampleLeads.technology[currentBusinessIndex];
+                alert(`Email sent to ${lead.owner} at ${lead.email}`);
+                
+                // Move to next business if not at the end
+                if (currentBusinessIndex < 4) {
+                    currentBusinessIndex++;
+                    updateBusinessReview();
+                } else {
+                    // If sending from the last business, go to export
+                    setActiveStep(4);
+                    document.getElementById('completedLeadsCount').textContent = 5;
+                    document.getElementById('emailsSentCount').textContent = sentEmails;
+                }
+            });
+            
+            backBtn4.addEventListener('click', function() {
+                setActiveStep(2);
+            });
+            
+            nextBtn4.addEventListener('click', function() {
+                setActiveStep(4);
+                document.getElementById('completedLeadsCount').textContent = 5;
+                document.getElementById('emailsSentCount').textContent = sentEmails;
+            });
+            
+            // Step 5: Export
+            const backBtn5 = document.getElementById('backBtn5');
+            const startNewBtn = document.getElementById('startNewBtn');
+            const exportDataBtn = document.getElementById('exportDataBtn');
+            const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+            
+            exportDataBtn.addEventListener('click', function() {
+                // Determine selected format
+                let format = '';
+                if (document.getElementById('formatExcel').checked) {
+                    format = 'Excel';
+                } else if (document.getElementById('formatCSV').checked) {
+                    format = 'CSV';
+                } else if (document.getElementById('formatGoogle').checked) {
+                    format = 'Google Sheets';
+                }
+                
+                alert(`Exporting data in ${format} format...`);
+            });
+            
+            submitFeedbackBtn.addEventListener('click', function() {
+                const feedbackText = document.getElementById('feedbackText').value;
+                const isDissatisfied = document.getElementById('dissatisfied').checked;
+                
+                if (feedbackText) {
+                    alert('Thank you for your feedback!');
+                    document.getElementById('feedbackText').value = '';
+                } else {
+                    alert('Please provide some feedback before submitting.');
+                }
+            });
+            
+            backBtn5.addEventListener('click', function() {
+                setActiveStep(3);
+            });
+            
+            startNewBtn.addEventListener('click', function() {
+                // Reset the app
+                setActiveStep(0);
+            });
+            
+            // Star rating system
+            document.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    
+                    document.querySelectorAll('.rating-btn svg').forEach((svg, index) => {
+                        if (index < rating) {
+                            svg.classList.remove('text-gray-400');
+                            svg.classList.add('text-yellow-400');
+                        } else {
+                            svg.classList.remove('text-yellow-400');
+                            svg.classList.add('text-gray-400');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
